@@ -23,10 +23,41 @@ export const favoriteBlog = (blogs) => {
   return favorite;
 };
 
+/**
+ * Finds the author with the most blogs from an array of blog objects.
+ *
+ * @param {Array<Object>} blogs - An array of blog objects. Each object must have an 'author' property.
+ * @returns {Object|null} An object with the top author and their blog count, or null if the input array is empty.
+ * Example: { author: "Robert C. Martin", blogs: 3 }
+ */
 export const mostBlogs = (blogs) => {
-  if (blogs.length === 0) {
-    return undefined;
+  // Return null if the input array is empty or invalid
+  if (!blogs || blogs.length === 0) {
+    return null;
   }
 
-  const authorCounts = blogs.reduce((acc) => {});
+  // Use an object to store the count of blogs for each author
+  const authorCounts = {};
+
+  // Iterate over the blogs to count posts by author
+  blogs.forEach((blog) => {
+    authorCounts[blog.author] = (authorCounts[blog.author] || 0) + 1;
+  });
+
+  // Find the author with the highest count
+  let topAuthor = "";
+  let maxBlogs = 0;
+
+  for (const author in authorCounts) {
+    if (authorCounts[author] > maxBlogs) {
+      maxBlogs = authorCounts[author];
+      topAuthor = author;
+    }
+  }
+
+  // Return the result in the specified format
+  return {
+    author: topAuthor,
+    blogs: maxBlogs,
+  };
 };
