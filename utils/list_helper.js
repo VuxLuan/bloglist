@@ -61,3 +61,30 @@ export const mostBlogs = (blogs) => {
     blogs: maxBlogs,
   };
 };
+
+export const mostLikes = (blogs) => {
+  if (!blogs || blogs.length === 0) {
+    return null;
+  }
+
+  const authorCounts = {};
+
+  blogs.forEach((blog) => {
+    authorCounts[blog.likes] = (authorCounts[blog.likes] || 0) + 1;
+  });
+
+  let topAuthor = "";
+  let totalLikes = 0;
+
+  for (const author in authorCounts) {
+    if (authorCounts[author.likes] > totalLikes) {
+      totalLikes = authorCounts[author.likes];
+      topAuthor = author;
+    }
+  }
+
+  return {
+    author: topAuthor,
+    likes: totalLikes
+  }
+};
