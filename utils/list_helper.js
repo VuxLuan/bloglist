@@ -1,9 +1,3 @@
-import _ from "lodash";
-
-export const dummy = () => {
-  return 1;
-};
-
 export const totalLikes = (blogs) => {
   const reducer = (sum, item) => {
     return sum + item.likes;
@@ -62,29 +56,36 @@ export const mostBlogs = (blogs) => {
   };
 };
 
+/**
+ * Finds the author with the most total likes across all blogs.
+ */
 export const mostLikes = (blogs) => {
+  // Gracefully handle empty or null input
   if (!blogs || blogs.length === 0) {
     return null;
   }
 
-  const authorCounts = {};
-
+  // Step 1: Create an object to store the total likes for each author.
+  const likesByAuthor = {};
   blogs.forEach((blog) => {
-    authorCounts[blog.likes] = (authorCounts[blog.likes] || 0) + 1;
+    // Use the author's name as the key.
+    // Add the current blog's likes to the author's total.
+    likesByAuthor[blog.author] = (likesByAuthor[blog.author] || 0) + blog.likes;
   });
 
+  // Step 2: Find the author with the highest like count from the created object.
   let topAuthor = "";
-  let totalLikes = 0;
+  let maxLikes = 0;
 
-  for (const author in authorCounts) {
-    if (authorCounts[author.likes] > totalLikes) {
-      totalLikes = authorCounts[author.likes];
-      topAuthor = author;
+  for (const author in likesByAuthor) {
+    if (likesByAuthor[author] > maxLikes) {
+      maxLikes = likesByAuthor[author]; // Update the max likes found so far
+      topAuthor = author; // Update the top author
     }
   }
 
   return {
     author: topAuthor,
-    likes: totalLikes
-  }
+    likes: maxLikes,
+  };
 };
