@@ -6,6 +6,8 @@ import {
   mostBlogs,
   mostLikes,
 } from "../utils/list_helper.js";
+import Blog from "../models/blog.js";
+
 
 // This test can remain separate as it uses unique data
 describe("total likes", () => {
@@ -116,3 +118,5 @@ describe("when there are multiple blogs", () => {
     });
   });
 });
+
+

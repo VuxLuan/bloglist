@@ -2,54 +2,16 @@ import { test, after, beforeEach } from "node/test";
 import mongoose from "mongoose";
 import supertest from "supertest";
 import app from "../app.js";
-import assert from "node/assert";
-import blog from "../models/blog.js";
+import assert from "assert";
+import Blog from "../models/blog.js";
+import { initialBlogs, blogsInDb } from "./list_helper.test.js";
 
 const api = supertest(app);
 
-const initialBlogs = [
-  {
-    title: "React patterns",
-    author: "Michael Chan",
-    url: "https://reactpatterns.com/",
-    likes: 7,
-  },
-  {
-    title: "Go To Statement Considered Harmful",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-    likes: 5,
-  },
-  {
-    title: "Canonical string reduction",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-    likes: 12,
-  },
-  {
-    title: "First class tests",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-    likes: 10,
-  },
-  {
-    title: "TDD harms architecture",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
-    likes: 0,
-  },
-  {
-    title: "Type wars",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
-    likes: 2,
-  },
-];
-
 beforeEach(async () => {
-  await blog.deleteMany({});
+  await Blog.deleteMany({});
   for (let b of initialBlogs) {
-    const blogObject = new blog(b);
+    const blogObject = new Blog(b);
     await blogObject.save();
   }
 });
@@ -89,9 +51,9 @@ test("a valid blog can be added", async () => {
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
-  const res = await api.get("/api/blogs");
-  const titles = res.body.map((b) => b.title);
-  assert.strictEqual(res.body.length, initialBlogs.length + 1);
+  const blogsAtEnd = await blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, initialBlogs.length + 1);
+  const titles = blogsAtEnd.map((b) => b.title);
   assert(titles.includes("You-Dont-Know-JS"));
 });
 
@@ -104,5 +66,17 @@ test("blog with no author can not be added", async () => {
 
   await api.post("/api/blogs").send(newBlog).expect(400);
 
-  const res = await api.get("/api/blogs");
+  const blogsAtEnd = await blogsInDb();
+  assert.strictEqual(blogsAtEnd.body.length, initialBlogs.length);
+});
+
+test("a specific blog can be viewed", async () => {
+  const blogAtStart = await blogsInDb();
+  const blogToView = blogAtStart[0];
+  const resultBlog = await api
+    .get(`/api/blogs/${blogToView.id}`)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  assert.deepStrictEqual(resultBlog.body, blogToView);
 });
