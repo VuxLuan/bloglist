@@ -1,4 +1,5 @@
 import Blog from "../models/blog.js";
+import { User } from "../models/user.js";
 
 export const totalLikes = (blogs) => {
   const reducer = (sum, item) => {
@@ -140,5 +141,10 @@ export const nonExistingId = async () => {
 
 export const blogsInDb = async () => {
   const blogs = await Blog.find({});
-  return blogs.map(b => b.toJSON());
+  return blogs.map((b) => b.toJSON());
+};
+
+export const userInDb = async () => {
+  const users = await User.find({});
+  return users.map((u) => u.toJSON());
 };
