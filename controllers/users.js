@@ -1,21 +1,26 @@
 import bcrypt from "bcrypt";
-import express from "express"
+import express from "express";
 
 import { User } from "../models/user.js";
 export const usersRouter = express.Router();
 
 usersRouter.post("/", async (req, res) => {
-  const {username, name, password} = req.body
+  const { username, name, password } = req.body;
 
-  const saltRounds = 10
-  const passwordHash = await bcrypt.hash(password, saltRounds)
+  const saltRounds = 10;
+  const passwordHash = await bcrypt.hash(password, saltRounds);
 
   const user = new User({
     username,
     name,
-    passwordHash
-  })
+    passwordHash,
+  });
 
-  const saveUser = await user.save()
-  res.status(201).json(saveUser)
-})
+  const saveUser = await user.save();
+  res.status(201).json(saveUser);
+});
+
+usersRouter.get("/", async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
+});

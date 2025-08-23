@@ -147,7 +147,7 @@ describe("when there is initially one user in db", () => {
       result.body.console.error.includes("expected `username` to be unique")
     );
 
-    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
   });
 });
 
